@@ -186,24 +186,31 @@
             return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
 
-        window.onresize = () => dimensionsHaveChanged = true;
-
         (function () {
             let request = null;
 
-            window.onmousedown = window.ontouchstart = function slideColor() {
+            function slideColor() {
                 cancelAnimationFrame(request);
                 request = requestAnimationFrame(slideColor);
                 theme += 1;
-            };
+            }
 
-            window.onmouseup = window.ontouchend = () => cancelAnimationFrame(request);
-        })();
+            function endSlide() {
+                cancelAnimationFrame(request)
+            }
+
+            document.addEventListener('mousedown', slideColor);
+            document.addEventListener('touchstart', slideColor);
+            document.addEventListener('mouseup', endSlide);
+            document.addEventListener('touchend', endSlide);
+        } ());
+
         // Prevent any zoom or scrolling on mobile devices
         document.addEventListener('gesturestart', (e) => e.preventDefault());
         document.addEventListener('touchmove', (e) => e.preventDefault());
 
-        render();
+        window.addEventListener('resize', () => dimensionsHaveChanged = true);
+        window.addEventListener('load', render);
     </script>
 </body>
 
