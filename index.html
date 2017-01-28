@@ -1,0 +1,203 @@
+<html>
+
+<head>
+    <title>Clock</title>
+    <style>
+    body {
+        background: hsl(210, 80%, 40%);
+        margin: 0;
+    }
+
+    #clock-canvas {
+        width: 100%;
+        height: 100%;
+    }
+    </style>
+</head>
+
+<body>
+    <canvas id="clock-canvas">
+    </canvas>
+    <script>
+        const canvas = document.getElementById("clock-canvas");
+        const ctx = canvas.getContext("2d");
+        const scale = window.devicePixelRatio || 1;
+        const color = {
+            background: hsl(210, 80, 30),
+            frame: hsl(210, 40, 80),
+            hour: hsl(210, 40, 80),
+            minute: hsl(210, 40, 60),
+            second: hsl(0, 80, 60),
+        };
+
+        const divisor = {
+            thick: 20,
+            thin: 40,
+        };
+
+        const radialPoint = {
+            longHand: 0.65,
+            shortHand: 0.45,
+            tickEnd: 0.75,
+            frame: 0.8,
+            pin: 0.04,
+        };
+
+        let width;
+        let height;
+
+        function render() {
+            requestAnimationFrame(render);
+
+            const x = width / 2;
+            const y = height / 2;
+            const radius = Math.min(width, height) / 2;
+
+            const hands = getHands(false);
+            const endPoints = {
+                second: getEndPoint(hands.second, radius * radialPoint.longHand),
+                minute: getEndPoint(hands.minute, radius * radialPoint.longHand),
+                hour: getEndPoint(hands.hour, radius * radialPoint.shortHand)
+            }
+
+
+            // Clock background
+            ctx.beginPath();
+            ctx.arc(x, y, radius * radialPoint.frame, 0, 2 * Math.PI);
+            ctx.fillStyle = color.background;
+            ctx.lineWidth = radius / divisor.thick;
+            ctx.fill();
+
+            // Minor ticks
+            ctx.beginPath();
+            for (let minorAngle = 0; minorAngle < 2 * Math.PI; minorAngle += Math.PI / 30) {
+                const start = getEndPoint(minorAngle, radius * radialPoint.frame);
+                const end = getEndPoint(minorAngle, radius * radialPoint.tickEnd);
+
+
+                ctx.moveTo(x + start.x, y + start.y);
+                ctx.lineTo(x + end.x, y + end.y);
+            }
+
+            ctx.lineWidth = radius / divisor.thin;
+            ctx.strokeStyle = color.minute;
+            ctx.stroke();
+
+            // Major ticks
+            ctx.beginPath();
+            for (let majorAngle = 0; majorAngle < 2 * Math.PI; majorAngle += Math.PI / 6) {
+                const start = getEndPoint(majorAngle, radius * radialPoint.frame);
+                const end = getEndPoint(majorAngle, radius * radialPoint.tickEnd);
+
+                ctx.moveTo(x + start.x, y + start.y);
+                ctx.lineTo(x + end.x, y + end.y);
+            }
+
+            ctx.strokeStyle = color.frame;
+            ctx.lineWidth = radius / divisor.thick;
+            ctx.stroke();
+
+            // Clock frame
+            ctx.moveTo(x + radius * radialPoint.frame, y);
+            ctx.arc(x, y, radius * radialPoint.frame, 0, 2 * Math.PI);
+            ctx.fillStyle = color.background;
+            ctx.lineWidth = radius / divisor.thick;
+            ctx.stroke();
+
+            // Minute hand
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + endPoints.minute.x, y + endPoints.minute.y);
+            ctx.strokeStyle = color.minute;
+            ctx.lineWidth = radius / divisor.thick;
+            ctx.stroke();
+
+            // Hour hand
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + endPoints.hour.x, y + endPoints.hour.y);
+            ctx.strokeStyle = color.hour;
+            ctx.lineWidth = radius / divisor.thick;
+            ctx.stroke();
+
+            // Second hand
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + endPoints.second.x, y + endPoints.second.y);
+            ctx.strokeStyle = color.second;
+            ctx.lineWidth = radius / divisor.thin;
+            ctx.stroke();
+
+            // Inner pin
+            ctx.beginPath();
+            ctx.arc(x, y, radius * radialPoint.pin, 0, 2 * Math.PI);
+            ctx.fillStyle = color.background;
+            ctx.strokeStyle = color.second;
+            ctx.lineWidth = radius / divisor.thin;
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function getEndPoint(angle, radius) {
+            angle = rotateLeft(-angle)
+
+            return {
+                x: -Math.cos(angle) * radius,
+                y: Math.sin(angle) * radius
+            }
+        }
+
+        function rotateLeft(angle) {
+            return angle - Math.PI / 2;
+        }
+
+        function getHands(stepped) {
+            // Obtain values of each time unit
+            var date = new Date();
+
+            if (stepped) {
+                return {
+                    hour: Math.PI * date.getHours() / 6,
+                    minute: Math.PI * date.getMinutes() / 30,
+                    second: Math.PI * date.getSeconds() / 30,
+                }
+            }
+
+            const hours = date.getHours();
+            const minutes = date.getMinutes() + hours * 60;
+            const seconds = date.getSeconds() + minutes * 60;
+            const milliseconds = date.getMilliseconds() + seconds * 1000;
+
+
+            const floatSeconds = (milliseconds % 60000) / 1000;
+            const floatMinutes = (milliseconds % 3600000) / 60000;
+            const floatHours = (milliseconds % 86400000) / 3600000;
+
+            return {
+                hour: 2 * Math.PI * floatHours / 12,
+                minute: 2 * Math.PI * floatMinutes / 60,
+                second: 2 * Math.PI * floatSeconds / 60
+            }
+        }
+
+        function hsl(hue, saturation, lightness) {
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`
+        }
+
+        function setCanvasDimensions() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            ctx.canvas.width = width * scale;
+            ctx.canvas.height = height * scale;
+            ctx.scale(scale, scale);
+            ctx.lineCap = "round";
+        }
+
+        window.onresize = setCanvasDimensions
+
+        setCanvasDimensions();
+        requestAnimationFrame(render)
+    </script>
+</body>
+
+</html>
