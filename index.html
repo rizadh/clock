@@ -45,9 +45,19 @@
 
         let width;
         let height;
+        let dimensionsHaveChanged = true;
 
         function render() {
             requestAnimationFrame(render);
+
+            if (dimensionsHaveChanged) {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                ctx.canvas.width = width * scale;
+                ctx.canvas.height = height * scale;
+                ctx.scale(scale, scale);
+                ctx.lineCap = "round";
+            }
 
             const x = width / 2;
             const y = height / 2;
@@ -176,18 +186,8 @@
             return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
 
-        function setCanvasDimensions() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            ctx.canvas.width = width * scale;
-            ctx.canvas.height = height * scale;
-            ctx.scale(scale, scale);
-            ctx.lineCap = "round";
-        }
+        window.onresize = () => dimensionsHaveChanged = true;
 
-        window.onresize = setCanvasDimensions;
-
-        setCanvasDimensions();
         requestAnimationFrame(render)
     </script>
 </body>
