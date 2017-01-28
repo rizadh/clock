@@ -53,7 +53,7 @@
             const y = height / 2;
             const radius = Math.min(width, height) / 2;
 
-            const hands = getHands(false);
+            const hands = getHands();
             const endPoints = {
                 second: getEndPoint(hands.second, radius * radialPoint.longHand),
                 minute: getEndPoint(hands.minute, radius * radialPoint.longHand),
@@ -151,17 +151,9 @@
             return angle - Math.PI / 2;
         }
 
-        function getHands(stepped) {
+        function getHands() {
             // Obtain values of each time unit
             var date = new Date();
-
-            if (stepped) {
-                return {
-                    hour: Math.PI * date.getHours() / 6,
-                    minute: Math.PI * date.getMinutes() / 30,
-                    second: Math.PI * date.getSeconds() / 30,
-                };
-            }
 
             const hours = date.getHours();
             const minutes = date.getMinutes() + hours * 60;
