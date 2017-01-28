@@ -4,7 +4,7 @@
     <title>Clock</title>
     <style>
     body {
-        background: hsl(210, 80%, 40%);
+        background: hsl(0, 0%, 50%);
         margin: 0;
     }
 
@@ -22,13 +22,7 @@
         const canvas = document.getElementById("clock-canvas");
         const ctx = canvas.getContext("2d");
         const scale = window.devicePixelRatio || 1;
-        const color = {
-            background: hsl(210, 80, 30),
-            frame: hsl(210, 40, 80),
-            hour: hsl(210, 40, 80),
-            minute: hsl(210, 40, 60),
-            second: hsl(0, 80, 60),
-        };
+        let theme = 210;
 
         const divisor = {
             thick: 20,
@@ -70,47 +64,53 @@
                 hour: getEndPoint(hands.hour, radius * radialPoint.shortHand),
             }
 
+            const color = {
+                background: hsl(theme, 80, 30),
+                frame: hsl(theme, 40, 80),
+                hour: hsl(theme, 40, 80),
+                minute: hsl(theme, 40, 60),
+                second: hsl(theme + 150, 80, 60),
+            };
+
+            document.body.style.background = hsl(theme, 80, 40);
 
             // Clock background
             ctx.beginPath();
             ctx.arc(x, y, radius * radialPoint.frame, 0, 2 * Math.PI);
             ctx.fillStyle = color.background;
-            ctx.lineWidth = radius / divisor.thick;
             ctx.fill();
 
             // Minor ticks
             ctx.beginPath();
-            for (let minorAngle = 0; minorAngle < 2 * Math.PI; minorAngle += Math.PI / 30) {
-                const start = getEndPoint(minorAngle, radius * radialPoint.frame);
-                const end = getEndPoint(minorAngle, radius * radialPoint.tickEnd);
-
+            for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 30) {
+                const start = getEndPoint(angle, radius * radialPoint.frame);
+                const end = getEndPoint(angle, radius * radialPoint.tickEnd);
 
                 ctx.moveTo(x + start.x, y + start.y);
                 ctx.lineTo(x + end.x, y + end.y);
             }
-
             ctx.lineWidth = radius / divisor.thin;
             ctx.strokeStyle = color.minute;
             ctx.stroke();
 
             // Major ticks
             ctx.beginPath();
-            for (let majorAngle = 0; majorAngle < 2 * Math.PI; majorAngle += Math.PI / 6) {
-                const start = getEndPoint(majorAngle, radius * radialPoint.frame);
-                const end = getEndPoint(majorAngle, radius * radialPoint.tickEnd);
+            for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 6) {
+                const start = getEndPoint(angle, radius * radialPoint.frame);
+                const end = getEndPoint(angle, radius * radialPoint.tickEnd);
 
                 ctx.moveTo(x + start.x, y + start.y);
                 ctx.lineTo(x + end.x, y + end.y);
             }
-
             ctx.strokeStyle = color.frame;
             ctx.lineWidth = radius / divisor.thick;
             ctx.stroke();
 
             // Clock frame
+            ctx.beginPath();
             ctx.moveTo(x + radius * radialPoint.frame, y);
             ctx.arc(x, y, radius * radialPoint.frame, 0, 2 * Math.PI);
-            ctx.fillStyle = color.background;
+            ctx.strokeStyle = color.frame;
             ctx.lineWidth = radius / divisor.thick;
             ctx.stroke();
 
@@ -188,7 +188,18 @@
 
         window.onresize = () => dimensionsHaveChanged = true;
 
-        requestAnimationFrame(render)
+        (function () {
+            let request = null;
+
+            window.onmousedown = window.ontouchstart = function slideColor() {
+                request = requestAnimationFrame(slideColor);
+                theme += 1;
+            };
+
+            window.onmouseup = window.ontouchend = () => cancelAnimationFrame(request);
+        })();
+
+        render();
     </script>
 </body>
 
