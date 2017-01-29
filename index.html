@@ -22,7 +22,7 @@
         const canvas = document.getElementById("clock-canvas");
         const ctx = canvas.getContext("2d");
         const scale = window.devicePixelRatio || 1;
-        let theme = 210;
+        let theme = parseInt(localStorage.theme) || 210;
 
         const divisor = {
             thick: 20,
@@ -194,6 +194,7 @@
                 cancelAnimationFrame(request);
                 request = requestAnimationFrame(slideColor);
                 theme += 1;
+                localStorage.theme = theme;
             }
 
             function endSlide() {
