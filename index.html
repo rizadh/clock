@@ -219,7 +219,7 @@
             } else if (window.MouseEvent && event instanceof MouseEvent) {
                 force = event.webkitForce;
             }
-            startAngle = Math.PI * sumForce / 6;
+            startAngle = Math.PI * Math.pow(force, 2) / 6;
         }
 
         // Prevent any zoom or scrolling on mobile devices
