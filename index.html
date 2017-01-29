@@ -23,7 +23,7 @@
         const canvas = document.getElementById("clock-canvas");
         const ctx = canvas.getContext("2d");
         const scale = window.devicePixelRatio || 1;
-        let theme = parseInt(localStorage.theme) || 210;
+        let theme = parseInt(localStorage.theme) || 190;
 
         const divisor = {
             thick: 20,
@@ -72,7 +72,7 @@
                 frame: hsl(theme, 40, 80),
                 hour: hsl(theme, 40, 80),
                 minute: hsl(theme, 40, 60),
-                second: hsl(theme + 150, 80, 60),
+                second: hsl(theme + 180, 80, 60),
             };
 
             document.body.style.background = hsl(theme, 80, 40);
@@ -228,7 +228,7 @@
 
         // Reset them on double-click
         document.addEventListener('dblclick', () => {
-            theme = 210;
+            theme = 190;
             localStorage.removeItem('theme');
         });
 
