@@ -224,6 +224,13 @@
         // Rotate dial with touch force
         document.addEventListener('touchforcechange', setStartAngle);
         document.addEventListener('touchend', setStartAngle);
+
+        // Reset them on double-click
+        document.addEventListener('dblclick', () => {
+            theme = 210;
+            localStorage.removeItem('theme');
+        });
+
         window.addEventListener('resize', () => dimensionsHaveChanged = true);
         window.addEventListener('load', render);
     </script>
