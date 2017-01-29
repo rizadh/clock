@@ -40,6 +40,7 @@
         let width;
         let height;
         let dimensionsHaveChanged = true;
+        let startAngle = 0;
 
         function render() {
             requestAnimationFrame(render);
@@ -83,7 +84,7 @@
 
             // Minor ticks
             ctx.beginPath();
-            for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 30) {
+            for (let angle = startAngle; angle < 2 * Math.PI + startAngle; angle += Math.PI / 30) {
                 const start = getEndPoint(angle, radius * radialPoint.frame);
                 const end = getEndPoint(angle, radius * radialPoint.tickEnd);
 
@@ -96,7 +97,7 @@
 
             // Major ticks
             ctx.beginPath();
-            for (let angle = 0; angle < 2 * Math.PI; angle += Math.PI / 6) {
+            for (let angle = startAngle; angle < 2 * Math.PI + startAngle; angle += Math.PI / 6) {
                 const start = getEndPoint(angle, radius * radialPoint.frame);
                 const end = getEndPoint(angle, radius * radialPoint.tickEnd);
 
@@ -208,10 +209,21 @@
             document.addEventListener('touchend', endSlide);
         } ());
 
+        function setStartAngle(touchEvent) {
+            let sumForce = 0;
+            for (let i = 0; i < touchEvent.touches.length; i++) {
+                sumForce += touchEvent.touches[i].force;
+            }
+            startAngle = Math.PI * sumForce / 6;
+        }
+
         // Prevent any zoom or scrolling on mobile devices
         document.addEventListener('gesturestart', (e) => e.preventDefault());
         document.addEventListener('touchmove', (e) => e.preventDefault());
 
+        // Rotate dial with touch force
+        document.addEventListener('touchforcechange', setStartAngle);
+        document.addEventListener('touchend', setStartAngle);
         window.addEventListener('resize', () => dimensionsHaveChanged = true);
         window.addEventListener('load', render);
     </script>
