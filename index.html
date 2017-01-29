@@ -194,6 +194,7 @@
                 cancelAnimationFrame(request);
                 request = requestAnimationFrame(slideColor);
                 theme += 1;
+                theme %= 360;
                 localStorage.theme = theme;
             }
 
