@@ -200,7 +200,7 @@
             }
 
             function endSlide() {
-                cancelAnimationFrame(request)
+                cancelAnimationFrame(request);
             }
 
             document.addEventListener('mousedown', slideColor);
@@ -231,7 +231,10 @@
             localStorage.removeItem('theme');
         });
 
+        // Set canvas dimensions on resize
         window.addEventListener('resize', () => dimensionsHaveChanged = true);
+
+        // Begin rendering when page has loaded
         window.addEventListener('load', render);
     </script>
 </body>
