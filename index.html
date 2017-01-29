@@ -208,6 +208,7 @@
             document.addEventListener('touchstart', slideColor);
             document.addEventListener('mouseup', endSlide);
             document.addEventListener('touchend', endSlide);
+            document.addEventListener('touchcancel', endSlide);
         } ());
 
         function setStartAngle(event) {
@@ -229,6 +230,7 @@
         // Rotate dial with touch force
         document.addEventListener('touchforcechange', setStartAngle);
         document.addEventListener('touchend', setStartAngle);
+        document.addEventListener('touchcancel', setStartAngle);
 
         // Rotate dial with mouse force
         document.addEventListener('webkitmouseforcechanged', setStartAngle);
