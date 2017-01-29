@@ -183,7 +183,8 @@
         }
 
         function hsl(hue, saturation, lightness) {
-            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+            return `hsl(${Math.round(hue)},${Math.round(saturation)}%,` +
+                `${Math.round(lightness)}%)`;
         }
 
         (function () {
