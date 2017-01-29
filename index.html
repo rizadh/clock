@@ -210,10 +210,14 @@
             document.addEventListener('touchend', endSlide);
         } ());
 
-        function setStartAngle(touchEvent) {
-            let sumForce = 0;
-            for (let i = 0; i < touchEvent.touches.length; i++) {
-                sumForce += touchEvent.touches[i].force;
+        function setStartAngle(event) {
+            let force = 0;
+            if (window.TouchEvent && event instanceof TouchEvent) {
+                for (let i = 0; i < event.touches.length; i++) {
+                    force += event.touches[i].force;
+                }
+            } else if (window.MouseEvent && event instanceof MouseEvent) {
+                force = event.webkitForce;
             }
             startAngle = Math.PI * sumForce / 6;
         }
@@ -225,6 +229,9 @@
         // Rotate dial with touch force
         document.addEventListener('touchforcechange', setStartAngle);
         document.addEventListener('touchend', setStartAngle);
+
+        // Rotate dial with mouse force
+        document.addEventListener('webkitmouseforcechanged', setStartAngle);
 
         // Reset them on double-click
         document.addEventListener('dblclick', () => {
